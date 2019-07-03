@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">    
+        <link rel="stylesheet" href="./main.css">
+    </head>
+    <bod>
+        <div class="container-custom">
+            <div class="row">
+                <div class="col-sm-6 col-sl-6 col-xs-6 text-center">
+                    <div class="booking-title">
+                        <h2>BOOKING ONLINE</h2>
+                    </div>
+                    <div class="theater-info">
+                        <p>CGV Vincom Da Nang | Yamaha Why Not | Seat number (133)</p>
+                        <p id="date-time"></p>
+                    </div>
+                    <h2>SCREEN</h2>
+                    <div class="screen"></div>
+                    <table id="seats" border="1" style="width: 100%"></table>
+                    
+                    <div class="unavailable"><p class="seats-status">Unavailable</p></div>
+                    <div class="available"><p class="seats-status">Available</p></div>
+                    <div class="your-selection"><p class="seats-status">Your selection</p></div>
+
+                    <div class="ticket-info text-left">
+                        <img src="./fastandfurious.jpg" class="image">
+                        <div class="info-block">
+                            <p id="movie-name">FAST AND FURIOUS</p>
+                        </div>
+                        <div class="title-info">
+                            <p>Cinema</p>
+                            <br>
+                            <p>Time</p>
+                            <br>
+                            <p>Price</p>
+                            <p>Seats</p>
+                        </div>
+                        <div class="content-info">
+                            <p>CGV Vincom Da Nang</p>
+                            <p id="show-time">27/06/2019 <br> 8:30 PM</p>
+                            <p id="price">45,000 &#x20AB;</p>
+                            <span id="booked-seats"></span>
+                        </div>
+                        <div class="title-info">
+                            <p>Total</p>
+                            <butotn class="btn btn-primary" onclick="bookTickets()">Book</butotn>
+                        </div>
+                        <div class="content-info">
+                            <span id="money-total">0</span> <span> &#x20AB;</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-sl-6 col-xs-6">
+                    <div class="list-booked">
+                        <h2>List booked tickets</h2>
+                        <table id="list-booked-tickets" border="1" style="width: 100%; text-align: center"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+    </bod>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <script src="./main.js"></script>
+    <script>
+        
+    </script>
+</html>
