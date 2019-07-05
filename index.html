@@ -18,9 +18,9 @@
                     </div>
                     <h2>SCREEN</h2>
                     <div class="screen"></div>
-                    <table id="seats" border="1" style="width: 100%"></table>
+                    <table id="seats"></table>
                     
-                    <div class="unavailable"><p class="seats-status">Unavailable</p></div>
+                    <div class="booked"><p class="seats-status">Booked</p></div>
                     <div class="available"><p class="seats-status">Available</p></div>
                     <div class="your-selection"><p class="seats-status">Your selection</p></div>
 
@@ -55,7 +55,16 @@
                 <div class="col-sm-6 col-sl-6 col-xs-6">
                     <div class="list-booked">
                         <h2>List booked tickets</h2>
-                        <table id="list-booked-tickets" border="1" style="width: 100%; text-align: center"></table>
+                        <table id="list-booked-tickets">
+                            <tr>
+                                <th style="text-align: center">Movie Name</th>
+                                <th style="text-align: center">Show Time</th>
+                                <th style="text-align: center">Seats Number</th>
+                                <th style="text-align: center">BookedDateTime</th>
+                                <th style="text-align: center">Total Money</th>
+                                <th style="text-align: center">Remove</th>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>
