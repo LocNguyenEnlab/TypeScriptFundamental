@@ -14,16 +14,15 @@ class Ticket {
     }
 
     bookTicket() : void {
-        if (selectedSeats.length != 0) {
+        if (seats.filter(s => s.status === 'Selected')[0]) {
             var isConfirm = confirm("Are you sure to book tickets!");
             if (isConfirm) {
-            
-                for (var seat of selectedSeats) {         
-                    seat.style.backgroundColor = 'red';  
-                    bookedSeats.push(seat);    
+                for (var seat of seats) {
+                    if (seat.status === 'Selected') {
+                        document.getElementById(seat.name).style.backgroundColor = 'red';
+                        seat.status = 'Booked';
+                    }
                 }
-    
-                selectedSeats = [];
                 
                 var ticket = {
                     MovieName: this.movieName, 
@@ -31,7 +30,7 @@ class Ticket {
                     SeatsNumber: this.seatNumber,
                     BookedDatetime: new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(),
                     TotalMoney: this.totalMoney.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,').toString() + " vnd",
-                    RemoveId: "ticket" + bookTickets.length
+                    RemoveId: "ticket" + bookedTickets.length
                 };    
                 bookedTickets.push(ticket);    
                 this.createTableOfListBookedTickets(ticket);    
@@ -46,7 +45,6 @@ class Ticket {
     }
 
     removeTicket(id:string) : void {
-        ///
         var isConfirm = confirm("Are you sure to remove this ticket!");
         if (isConfirm) {
             var table:HTMLTableElement = <HTMLTableElement> document.getElementById('list-booked-tickets');
@@ -63,22 +61,17 @@ class Ticket {
                         }
                     }
 
-                    var seats = ticket.SeatsNumber.split(" ");
-                    for (var seat of seats) {
-                        if (seat === "")
+                    var seatsName = ticket.SeatsNumber.split(" ");
+                    for (var seatName of seatsName) {
+                        if (seatName === "")
                             continue;
-                        var seatIndex = bookedSeats.indexOf(findElementById(seats, seat));
-                        bookedSeats.splice(seatIndex, 1);
-                        var btn = document.getElementById(seat);
+                        seats.filter(s => s.name === seatName)[0].status = 'Available';
+                        var btn = document.getElementById(seatName);
                         btn.style.backgroundColor = "#74e393";
-                        freeSeats.push(btn);
                     }
                     table.deleteRow(i);            
                     break;
                 }
-            }
-            for (var i = 0; i < bookedTickets.length; i++) {
-                var x = (bookedTickets[i])
             }
         }
     }
@@ -105,58 +98,58 @@ class Ticket {
 }
 
 class Seat {
+    name: string;
+    status: string;
+
     constructor(){}
 
-    addSeatsNumber(seatArray) : void {
+    addSeatsNumber() : void {
         for (var i = 'A'; i < 'J'; i = String.fromCharCode(i.charCodeAt(0) + 1)) {
-            var x: string;
             for (var j = 1; j < 13; j++) {
-                x = (i+j).toString()
-                seatArray.push(x);
+                var tempSeat = new Seat();
+                tempSeat.name = (i+j).toString();
+                tempSeat.status = 'Available';
+                seats.push(tempSeat);
             }
         }        
     }
 
-    createSeats(seatArray) : void {
+    createSeats() : void {
         var table: HTMLTableElement = <HTMLTableElement> document.getElementById("seats");
         var row = table.insertRow();
         var count = 1;
-        for (var element of seatArray) {
-            if (count == 13) {
+        for (var element of seats) {
+            if (count === 13) {
                 var row = table.insertRow();
                 count = 1;
             }
             var cell = row.insertCell();
             var btnSeat = document.createElement("button");
-            btnSeat.innerHTML = element;
-            btnSeat.id = element;
+            btnSeat.innerHTML = element.name;
+            btnSeat.id = element.name;
             btnSeat.style.width = '100%';
             btnSeat.style.backgroundColor = '#74e393';
             btnSeat.style.border = 'none';
             btnSeat.addEventListener('click', function() {new Seat().changeSeats(event)}, false);
             cell.appendChild(btnSeat);
-            freeSeats.push(btnSeat);
             count++;
         }
     }
 
     changeSeats(event) : void {
         var btnSeat:HTMLElement = <HTMLElement> document.getElementById(event.target.id);
-        var freeSeatIndex = freeSeats.indexOf(findElementById(freeSeats, btnSeat.id));
-        var selectedSeatIndex = selectedSeats.indexOf(findElementById(selectedSeats, btnSeat.id));
+        var seat = seats.filter(s => s.name === event.target.id)[0];
         var textBoxBookedSeats = document.getElementById("booked-seats");
-        if (freeSeatIndex != -1) {
+        if (seat.status === 'Available') {
             btnSeat.style.backgroundColor = "cyan";
-            freeSeats.splice(freeSeatIndex, 1);
-            selectedSeats.push(btnSeat);
+            seat.status = 'Selected';
             textBoxBookedSeats.innerHTML += (btnSeat.id + " ");
             moneyTotal += 45000;
             document.getElementById("money-total").textContent = moneyTotal.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,').toString();
         }
-        else if (selectedSeatIndex != -1) {
+        else if (seat.status === 'Selected') {
             btnSeat.style.backgroundColor = "#74e393";
-            freeSeats.push(btnSeat);
-            selectedSeats.splice(selectedSeatIndex, 1);
+            seat.status = 'Available';
             var bookedSeatsName = textBoxBookedSeats.textContent;
             bookedSeatsName = bookedSeatsName.replace(btnSeat.id, "");
             textBoxBookedSeats.innerHTML = bookedSeatsName;  
@@ -167,24 +160,13 @@ class Seat {
 }
 
 var seats = [];
-var freeSeats = [];
-var bookedSeats = [];
-var selectedSeats = [];
 var moneyTotal = 0;
 var bookedTickets = [];
 
-function findElementById(arrays, id) {
-    for (var element of arrays) {
-        if (element.id === id) {
-            return element;            
-        }
-    }
-}
-
 var seat = new Seat();
 
-seat.addSeatsNumber(seats);
-seat.createSeats(seats);
+seat.addSeatsNumber();
+seat.createSeats();
 
 function bookTickets() {
     var ticket = new Ticket(
