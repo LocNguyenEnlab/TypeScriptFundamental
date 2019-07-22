@@ -1,19 +1,19 @@
-class Ticket {
+class TicketModel {
     movieName: string;
     showTime: string;
     seatNumber: string;
     bookedDateTime: string;
     totalMoney: number;
+    removeTicketId: string;
+}
 
-    constructor (public moviename: string, public showtime: string, public seatnumber: string, public bookeddatetime: string, public totalmoney: number) {
-        this.movieName = moviename;
-        this.showTime = showtime;
-        this.seatNumber = seatnumber;
-        this.bookedDateTime = bookeddatetime;
-        this.totalMoney = totalmoney;
-    }
+class SeatModel {
+    name: string;
+    status: string;
+}
 
-    bookTicket() : void {
+class TicketService {
+    bookTicket(ticket) : void {
         if (seats.filter(s => s.status === 'Selected')[0]) {
             var isConfirm = confirm("Are you sure to book tickets!");
             if (isConfirm) {
@@ -23,17 +23,10 @@ class Ticket {
                         seat.status = 'Booked';
                     }
                 }
-                
-                var ticket = {
-                    MovieName: this.movieName, 
-                    ShowTime: this.showTime, 
-                    SeatsNumber: this.seatNumber,
-                    BookedDatetime: new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(),
-                    TotalMoney: this.totalMoney.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,').toString() + " vnd",
-                    RemoveId: "ticket" + bookedTickets.length
-                };    
+                ticket.totalMoney = ticket.totalMoney.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,').toString() + " vnd";  
+                ticket.removeTicketId = "ticket" + bookedTickets.length;
                 bookedTickets.push(ticket);    
-                this.createTableOfListBookedTickets(ticket);    
+                this.createTableOfBookedTicketsList(ticket);    
                 document.getElementById("booked-seats").innerHTML = "";
                 document.getElementById("money-total").textContent = "0";
                 moneyTotal = 0;
@@ -44,24 +37,24 @@ class Ticket {
         }
     }
 
-    removeTicket(id:string) : void {
+    removeTicket(removeTicketId:string) : void {
         var isConfirm = confirm("Are you sure to remove this ticket!");
         if (isConfirm) {
             var table:HTMLTableElement = <HTMLTableElement> document.getElementById('list-booked-tickets');
             var rows = table.getElementsByTagName('tr');
             for (var i = 1; i < rows.length; i++) {
-                if (rows[i].cells[5].firstElementChild.id === id) {
-                    var timeBooked = rows[i].cells[3].childNodes[0].textContent;
-                    var ticket;
+                if (rows[i].cells[5].firstElementChild.id === removeTicketId) {
+                    
+                    var ticket: TicketModel;
 
                     for (var ticketItem of bookedTickets) {
-                        if (ticketItem.BookedDatetime === timeBooked){
+                        if (ticketItem.removeTicketId === removeTicketId){
                             ticket = ticketItem;
                             break;
                         }
                     }
 
-                    var seatsName = ticket.SeatsNumber.split(" ");
+                    var seatsName = ticket.seatNumber.split(" ");
                     for (var seatName of seatsName) {
                         if (seatName === "")
                             continue;
@@ -76,18 +69,18 @@ class Ticket {
         }
     }
 
-    createTableOfListBookedTickets(ticket) : void {
+    createTableOfBookedTicketsList(ticket) : void {
         var table: HTMLTableElement = <HTMLTableElement> document.getElementById("list-booked-tickets");
         var row = table.insertRow();    
         for (var element in ticket) {
             var cell = row.insertCell();        
-            if (element === "RemoveId") {
+            if (element === "removeTicketId") {
                 var btnRemove = document.createElement("button");
                 btnRemove.innerHTML = "x";
                 btnRemove.style.border = "none";
                 btnRemove.style.backgroundColor = "white";
                 btnRemove.id = ticket[element];                
-                btnRemove.addEventListener('click', function() {new Ticket("","", "", "", 2).removeTicket(btnRemove.id)}, false);
+                btnRemove.addEventListener('click', function() {new TicketService().removeTicket(btnRemove.id)}, false);
                 cell.appendChild(btnRemove);
                 break;
             }
@@ -97,18 +90,15 @@ class Ticket {
     }
 }
 
-class Seat {
-    name: string;
-    status: string;
-
-    constructor(){}
+class SeatService {
 
     addSeatsNumber() : void {
         for (var i = 'A'; i < 'J'; i = String.fromCharCode(i.charCodeAt(0) + 1)) {
             for (var j = 1; j < 13; j++) {
-                var tempSeat = new Seat();
-                tempSeat.name = (i+j).toString();
-                tempSeat.status = 'Available';
+                var tempSeat: SeatModel= {
+                    name: (i+j).toString(),
+                    status: 'Available',
+                };
                 seats.push(tempSeat);
             }
         }        
@@ -130,7 +120,7 @@ class Seat {
             btnSeat.style.width = '100%';
             btnSeat.style.backgroundColor = '#74e393';
             btnSeat.style.border = 'none';
-            btnSeat.addEventListener('click', function() {new Seat().changeSeats(event)}, false);
+            btnSeat.addEventListener('click', function() {new SeatService().changeSeats(event)}, false);
             cell.appendChild(btnSeat);
             count++;
         }
@@ -163,19 +153,20 @@ var seats = [];
 var moneyTotal = 0;
 var bookedTickets = [];
 
-var seat = new Seat();
+var seatService = new SeatService();
+var ticketService = new TicketService();
 
-seat.addSeatsNumber();
-seat.createSeats();
+seatService.addSeatsNumber();
+seatService.createSeats();
 
 function bookTickets() {
-    var ticket = new Ticket(
-        document.getElementById("movie-name").textContent.toString(), 
-        document.getElementById("show-time").textContent.toString(),
-        document.getElementById("booked-seats").textContent.toString(),
-        new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(),
-        +document.getElementById("money-total").textContent.replace(",", "")
-    );    
-    
-    ticket.bookTicket();    
+    var ticket: TicketModel = {
+        movieName: document.getElementById("movie-name").textContent.toString(), 
+        showTime: document.getElementById("show-time").textContent.toString(),
+        seatNumber: document.getElementById("booked-seats").textContent.toString(),
+        bookedDateTime: new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(),
+        totalMoney: +document.getElementById("money-total").textContent.replace(",", ""),
+        removeTicketId: '',
+    };    
+    ticketService.bookTicket(ticket);    
 }
